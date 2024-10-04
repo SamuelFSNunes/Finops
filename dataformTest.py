@@ -1,6 +1,21 @@
 import time
 from google.cloud import dataform_v1beta1 as dataform
 
+
+"""
+    Faz upload de um arquivo SQLX para o repositório Dataform em uma workspace específica.
+
+    Parâmetros:
+        project_id (str): O ID do projeto do Google Cloud.
+        repository_id (str): O ID do repositório no Dataform.
+        workspace (str): O nome da workspace onde o arquivo será carregado.
+        file_path_local (str): Caminho local do arquivo SQLX.
+        file_path_repo (str): Caminho no repositório Dataform onde o arquivo será salvo.
+
+    Funcionalidade:
+        - Carrega um arquivo local (SQLX) para o workspace de um repositório Dataform.
+        - Codifica o conteúdo do arquivo em UTF-8.
+    """
 def upload_sqlx_file(project_id, repository_id, workspace, file_path_local, file_path_repo):
     """
     Faz upload de um arquivo SQLX para o repositório Dataform em uma workspace específica.
@@ -38,6 +53,18 @@ def upload_sqlx_file(project_id, repository_id, workspace, file_path_local, file
         print(f"Erro ao enviar o arquivo: {e}")
 
 
+"""
+    Cria um resultado de compilação para um repositório Dataform.
+
+    Parâmetros:
+        project_id (str): O ID do projeto do Google Cloud.
+        repository_id (str): O ID do repositório no Dataform.
+        workspace (str): A branch ou workspace que está sendo compilada.
+
+    Funcionalidade:
+        - Gera um resultado de compilação para os arquivos carregados no workspace.
+        - Retorna a resposta da API com o resultado da compilação.
+    """
 def sample_create_compilation_result(project_id, repository_id, workspace):
     # Cria um cliente para o Dataform
     client = dataform.DataformClient()
@@ -61,6 +88,21 @@ def sample_create_compilation_result(project_id, repository_id, workspace):
     return response
 # sample_create_compilation_result()
 
+
+"""
+    Executa um job completo no Dataform, desde a compilação dos arquivos até a execução de um workflow.
+
+    Parâmetros:
+        project_id (str): O ID do projeto do Google Cloud.
+        repository_id (str): O ID do repositório no Dataform.
+        workspace (str): A branch ou workspace que será compilada e executada.
+        dataset_id (str): O dataset no BigQuery que será alvo da execução.
+        file_name (str): O nome do arquivo que será executado.
+
+    Funcionalidade:
+        - Compila os arquivos no repositório Dataform.
+        - Executa o workflow correspondente e retorna o resultado da execução.
+    """
 def create_workflow_invocation(compilation_result, project_id, repository_id, dataset_id, file_name):
     # Cria um cliente para o Dataform
     client = dataform.DataformClient()
@@ -91,9 +133,22 @@ def create_workflow_invocation(compilation_result, project_id, repository_id, da
     print(response)
     # Manipula a resposta
     return response
-
 #create_workflow_invocation()
 
+"""
+    Executa um job completo no Dataform, desde a compilação dos arquivos até a execução de um workflow.
+
+    Parâmetros:
+        project_id (str): O ID do projeto do Google Cloud.
+        repository_id (str): O ID do repositório no Dataform.
+        workspace (str): A branch ou workspace que será compilada e executada.
+        dataset_id (str): O dataset no BigQuery que será alvo da execução.
+        file_name (str): O nome do arquivo que será executado.
+
+    Funcionalidade:
+        - Compila os arquivos no repositório Dataform.
+        - Executa o workflow correspondente e retorna o resultado da execução.
+    """
 def execute_job(project_id, repository_id, workspace, dataset_id, file_name):
 
     compilation_result = sample_create_compilation_result(project_id=project_id, repository_id=repository_id, workspace=workspace)
