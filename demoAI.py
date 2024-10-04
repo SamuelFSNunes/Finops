@@ -2,7 +2,20 @@ import vertexai
 from vertexai.generative_models import GenerativeModel, Part, SafetySetting
 import re
 
+"""
+    Gera um conteúdo com base na mensagem de entrada usando um modelo generativo do Vertex AI.
 
+    Parâmetros:
+        message (str): A mensagem de entrada para o modelo generativo.
+
+    Retorno:
+        response (str): A resposta gerada pelo modelo.
+
+    Funcionalidade:
+        - Inicializa o cliente Vertex AI no projeto especificado.
+        - Configura o modelo generativo com as instruções de sistema e parâmetros de geração.
+        - Chama o modelo para gerar uma resposta baseada na mensagem de entrada.
+    """
 def generate(message):
     vertexai.init(project="squadcalouros", location="us-central1")
     model = GenerativeModel(
@@ -17,17 +30,14 @@ def generate(message):
 
     return response
 
-text1 = """Tenho uma tabela no Big Query chamada \"squadcalouros.dataform.eventos\" que possui o seguinte esquema [{\"name\": \"subscription_name\", \"mode\": \"\", \"type\": \"STRING\", \"description\": \"\", \"fields\": []}, {\"name\": \"message_id\", \"mode\": \"\", \"type\": \"STRING\", \"description\": \"\", \"fields\": []}, {\"name\": \"publish_time\", \"mode\": \"\", \"type\": \"TIMESTAMP\", \"description\": \"\", \"fields\": []}, {\"name\": \"data\", \"mode\": \"\", \"type\": \"JSON\", \"description\": \"\", \"fields\": []}, {\"name\": \"attributes\", \"mode\": \"\", \"type\": \"STRING\", \"description\": \"\", \"fields\": []}]. 
-Meu objetivo é criar uma VIEW apenas com os valores que estão na coluna \"data\" e quero que esses dados estejam no mesmo tipos que estão no JSON,  como ela está em um formato JSON será necessário usar a função JSON_VALUE.
-{\"account\":{\"account_number\":\"1234567890123456\",\"account_type\":\"Checking\",\"bank\":{\"address\":{\"city\":\"New York\",\"state\":\"NY\",\"street\":\"123 Main Street\",\"zip_code\":\"10001\"},\"branch\":\"Main Street\",\"name\":\"Global Bank\"},\"currency\":\"USD\"},\"recipient\":{\"account_number\":\"6543210987654321\",\"bank\":{\"address\":{\"city\":\"Los Angeles\",\"state\":\"CA\",\"street\":\"456 Broadway\",\"zip_code\":\"90001\"},\"branch\":\"Downtown\",\"name\":\"World Trust Bank\"},\"name\":\"John Doe\"},\"sender\":{\"account_number\":\"1111222233334444\",\"bank\":{\"address\":{\"city\":\"Chicago\",\"state\":\"IL\",\"street\":\"789 Business Lane\",\"zip_code\":\"60601\"},\"branch\":\"Corporate Plaza\",\"name\":\"Enterprise Bank\"},\"name\":\"ABC Corp\"},\"transaction_details\":{\"amount\":1500.75,\"description\":\"Salary for September 2024\",\"fees\":{\"amount\":15,\"currency\":\"USD\"},\"method\":\"Wire Transfer\",\"reference_number\":\"REF987654321\",\"status\":\"Completed\",\"timestamp\":\"2024-09-17T10:30:00Z\",\"type\":\"Credit\"},\"transaction_id\":\"TX123456789\"}.
-Me retorne apenas a query"""
-
+# Define parâmetros como o número máximo de tokens de saída e outros ajustes de geração.
 generation_config = {
     "max_output_tokens": 8192,
     "temperature": 1,
     "top_p": 0.95,
 }
 
+# Define parâmetros de segurança para bloquear conteúdo prejudicial ou ofensivo.
 safety_settings = [
     SafetySetting(
         category=SafetySetting.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -47,6 +57,19 @@ safety_settings = [
     ),
 ]
 
+"""
+    Extrai uma consulta SQL da resposta gerada pelo modelo.
+
+    Parâmetros:
+        response (str): A resposta gerada pelo modelo, que pode conter uma consulta SQL.
+
+    Retorno:
+        sql_query (str ou None): A query SQL extraída, ou None se não for encontrada.
+
+    Funcionalidade:
+        - Utiliza expressões regulares para buscar uma consulta SQL específica dentro da resposta.
+        - Retorna a consulta encontrada ou uma mensagem de erro caso não encontre.
+    """
 def get_query_in_response(response):
     match = re.search(r'CREATE\s+OR\s+REPLACE\s+VIEW\s+`[^`]+`\s+AS[\s\S]*?FROM\s+`([^`]+)`', response)
 
@@ -58,6 +81,17 @@ def get_query_in_response(response):
         print("Query não encontrada.")
         return
 
+"""
+    Cria um arquivo `.sqlx` com a consulta SQL fornecida.
+
+    Parâmetros:
+        query (str): A query SQL que será gravada no arquivo.
+        file_name (str): O nome base do arquivo sem extensão.
+
+    Funcionalidade:
+        - Gera um arquivo com a extensão `.sqlx` e escreve a consulta SQL no arquivo.
+        - Exibe uma mensagem de sucesso após a criação do arquivo.
+    """
 def create_sqlx(query, file_name):
     file_name = f"{file_name}.sqlx"
     with open(file_name, "w") as file:
