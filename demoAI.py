@@ -27,7 +27,7 @@ def generate(message):
         generation_config=generation_config,
         safety_settings=safety_settings,
     )
-
+    print(response.text)
     return response
 
 # Define parâmetros como o número máximo de tokens de saída e outros ajustes de geração.
@@ -71,14 +71,14 @@ safety_settings = [
         - Retorna a consulta encontrada ou uma mensagem de erro caso não encontre.
     """
 def get_query_in_response(response):
-    match = re.search(r'CREATE\s+OR\s+REPLACE\s+VIEW\s+`[^`]+`\s+AS[\s\S]*?FROM\s+`([^`]+)`', response)
-
+    match = re.search(r'CREATE\s+OR\s+REPLACE\s+VIEW([\s\S]*?)FROM\s+(`?squadcalouros\.dataform\.\w+`?)', response)
     if match:
         sql_query = match.group(0).strip()  # Obtemos a parte capturada e removemos espaços em branco
         print(sql_query)
         return sql_query
     else:
         print("Query não encontrada.")
+        print(match)
         return
 
 """
