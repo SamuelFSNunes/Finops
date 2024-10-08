@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW `squadcalouros.dataform.eventos_data` AS
+CREATE OR REPLACE VIEW `squadcalouros.dataform.ev-tra-management-delete_transaction-success-v1` AS
 SELECT
     JSON_VALUE(data, '$.account.account_number') AS account_number,
     JSON_VALUE(data, '$.account.account_type') AS account_type,
@@ -36,4 +36,4 @@ SELECT
     JSON_VALUE(data, '$.transaction_details.type') AS transaction_details_type,
     JSON_VALUE(data, '$.transaction_id') AS transaction_id
 FROM
-    `squadcalouros.dataform.eventos`
+    `squadcalouros.dataform.eventos_oficial`
